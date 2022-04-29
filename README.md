@@ -36,9 +36,9 @@ Remarque :
 
 · _Afficher les produits en rupture de stock_
 
-### **La gestion des entrées** :
+### La gestion des entrées :
 
-permet d'enregistrer une entrée en stock d'un produit (vérifier que les produits fournis existent au niveau du fichier "produits.txt" et mettre à jour le stock
+permet d'enregistrer une entrée en stock d'un produit (vérifier que les produits fournis existent au niveau du fichier "produits.txt" et mettre à jour le stock)
 
 ### **La gestion des ventes** :
 
@@ -50,6 +50,35 @@ affiche pour chaque produit les ventes effectuées
 
 # HOW TO RUN THIS ?
 
-1 - clone the repo
-2 - pip3 install -r requirements.txt
-3 - python3 main.py
+# # 1 - clone the repo
+
+```sh
+git clone
+
+```
+
+# 2 - Install the dependencies
+
+```sh
+pip3 install -r requirements.txt # linux / MacOS
+
+pip install -r requirements.txt # windows
+
+```
+
+# 3 - Run the application
+
+```sh
+python3 main.py # linux / MacOS
+
+py main.py # windows
+
+```
+
+---
+
+<a class="github-button" href="https://github.com/sponsors/0xtz" data-color-scheme="no-preference: dark; light: dark; dark: dark_dimmed;" data-icon="octicon-heart" data-size="large" aria-label="Sponsor @0xtz on GitHub">Sponsor</a>
+
+<!-- Place this tag where you want the button to render. -->
+
+<a class="github-button" href="https://github.com/ntkme/github-buttons" data-color-scheme="no-preference: dark; light: dark; dark: dark_dimmed;" data-icon="octicon-star" data-size="large" aria-label="Star ntkme/github-buttons on GitHub">Star</a>

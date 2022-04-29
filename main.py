@@ -1,41 +1,56 @@
-# Author : @0xtz
-# version : 0.1.2
-# date : 2020-04-24
+# Author : @0xtz 
 
-#!/usr/bin/python3
+#!/bin/python3 
 
-# TODO " import just the needed components"
 from PyQt6 import uic, QtCore, QtWidgets
-from PyQt6.QtCore import QDateTime
-from PyQt6.QtWidgets import * # QApplication, QWidget, QMainWindow 
+from PyQt6.QtCore import QDateTime, QDate
+from PyQt6.QtWidgets import *
 from PyQt6.QtGui import QIcon
 
-import sys, time, os
-import sqlite3 
+import sys, time, os, sqlite3
+os.environ["QT_FONT_DPI"] = "96" # FIX Problem for High DPI and Scale above 100%
 
-# load the ui file
+# load the ui.py file
 from mainUI import Ui_MainWindow
 
+# load the ui file
+# Ui_MainWindow = uic.loadUiType("./ui/mainUI.ui")[0]
+
 WINDOW_SIZE = 0
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+
 
 class MyApp(QMainWindow, Ui_MainWindow):
     def __init__(self) -> None:
         super().__init__()
         super().setupUi(self)
-        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
-        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.ui()
         self.buttons_handler()
 
-        
-    def mousePressEvent(self, event):
+    def ui(self) -> None:
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+
+        # self.label_path.setText(CURRENT_DIR)
+        # self.label_path.setStyleSheet("font-size:12pt; font-weight:700; color:#bd93f9;")
+
+        self.label_time.setText(time.strftime("%H:%M"))
+        self.label_time.setStyleSheet("font-size:12pt; font-weight:700; color:#bd93f9;")
+        # update the label_time every second
+        # self.timer = QTimer()
+        # self.timer.timeout.connect(self.update_time)
+        # self.timer.start(1000)
+
+    
+    def mousePressEvent(self, event) -> None:
         self.dragPos = event.globalPosition().toPoint()
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event) -> None:
       self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos )
       self.dragPos = event.globalPosition().toPoint()
       event.accept()
 
-    def restore_or_maximize_window(self):
+    def restore_or_maximize_window(self) -> None:
         # Global windows state
         global WINDOW_SIZE 
         win_status = WINDOW_SIZE
@@ -49,27 +64,32 @@ class MyApp(QMainWindow, Ui_MainWindow):
             WINDOW_SIZE = 0
             self.showNormal()
 
-    def buttons_handler(self):
-        # title bar btns
-        self.btn_close.clicked.connect(self.close) # close button
-        self.btn_minimize.clicked.connect(self.showMinimized) # minimize button
-        self.btn_maximize.clicked.connect(self.restore_or_maximize_window) # maximize button
-
-        # # # nav Menu btns
+    # todo button handlers 
+    # todo btn_name 
+    def buttons_handler(self) -> None:
+        self.btn_close.clicked.connect(self.close)
+        self.btn_minimize.clicked.connect(self.showMinimized)
+        self.btn_maximize.clicked.connect(self.restore_or_maximize_window)
+        # self.btn_settings.clicked.connect(self.settings)
+        # self.btn_about.clicked.connect(self.about)
+        # self.btn_help.clicked.connect(self.help)
+        # self.btn_exit.clicked.connect(self.exit)
 
         # change the stackedWidget index
         self.btn_welcome.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
         self.btn_gestion.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
-        self.btn_g_entree.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
+        self.btn_g_entre.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
         self.btn_g_produit.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(3))
         self.btn_ventes.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(4))
+        # TODO add a settings page
+        self.btn_settings.clicked.connect(lambda: self.load_csv_to_db())
 
         self.btn_refrech_table_rupture_stock.clicked.connect(self.table_rupture)
         self.btn_create_p.clicked.connect(self.create_produit)
         self.btn_edite_p.clicked.connect(self.edite_produit)
         self.btn_delete_p.clicked.connect(self.delete_produit)
         self.btn_search_produit.clicked.connect(self.search_produit)
-        self.btn_create_entres.clicked.connect(self.create_entres)
+        self.btn_create_entre.clicked.connect(self.create_entres)
         self.btn_vente.clicked.connect(self.create_ventes)
         self.btn_refrech_ventes.clicked.connect(self.refrech_ventes)
 
@@ -177,7 +197,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         cursor = db.cursor()
         result = cursor.execute(""" SELECT QuantiteStock FROM Produit WHERE ReferencePro = ?""",
                                 (
-                                    self.linedit_reference_entres.text(),
+                                    self.linedit_reference_entre.text(),
                                 ))
         fetch_result = cursor.fetchone()
         # if the product exist
@@ -189,9 +209,9 @@ class MyApp(QMainWindow, Ui_MainWindow):
                                 VALUES(?, ?, ?, ?)
                         """,
                             (   datetime.toString(),
-                                int(self.linedit_quantite_entres.text()),
-                                self.linedit_reference_entres.text(),
-                                self.linedit_raison_entres.text()
+                                int(self.linedit_quantite_entre.text()),
+                                self.linedit_reference_entre.text(),
+                                self.linedit_raison_entre.text()
                             ))
             db.commit()
             db.close()
@@ -200,15 +220,15 @@ class MyApp(QMainWindow, Ui_MainWindow):
             cursor = db.cursor()
             cursor.execute(""" UPDATE Produit SET QuantiteStock = ? WHERE ReferencePro = ? """,
                             (
-                                int(fetch_result[0]) + int(self.linedit_quantite_entres.text()),
-                                self.linedit_reference_entres.text()
+                                int(fetch_result[0]) + int(self.linedit_quantite_entre.text()),
+                                self.linedit_reference_entre.text()
                             ))                            
             db.commit()
             db.close()
             # clear the line edit
-            self.linedit_reference_entres.clear()
-            self.linedit_quantite_entres.clear()
-            self.linedit_raison_entres.clear()
+            self.linedit_reference_entre.clear()
+            self.linedit_quantite_entre.clear()
+            self.linedit_raison_entre.clear()
         else:
             # if the product doesn't exist
             self.window_alert("Produit inexistant")
@@ -287,6 +307,9 @@ class MyApp(QMainWindow, Ui_MainWindow):
         retval = msg.exec()
 
 
+
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MyApp()
@@ -294,11 +317,18 @@ if __name__ == "__main__":
     sys.exit(app.exec())
 
 
-# REFERENCES 
-"""
-https://www.sqlitetutorial.net/sqlite-python : SQLite Python Tutorial
 
-https://zetcode.com/ : PyQt6 Tutorials
 
-"""
-
+# QPushButton#btn_welcome {
+# 	border: 2px solid rgb(52, 59, 72);
+# 	border-radius: 5px;	
+# 	background-color: rgb(52, 59, 72);
+# }
+# QPushButton#btn_welcome:hover {
+# 	background-color: rgb(57, 65, 80);
+# 	border: 2px solid rgb(61, 70, 86);
+# }
+# QPushButton#btn_welcome:pressed {	
+# 	background-color: rgb(35, 40, 49);
+# 	border: 2px solid rgb(43, 50, 61);
+# }
